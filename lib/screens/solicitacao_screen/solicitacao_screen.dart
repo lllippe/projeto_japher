@@ -30,7 +30,7 @@ class _SolicitacaoScreenState extends State<SolicitacaoScreen> {
 
   // A base de dados mostrada na lista
   Map<String, Sze010> database = {};
-  Map<String, Szh010> databaseSzh = {};
+  Map<int, Szh010> databaseSzh = {};
   final Szh010Service _szh010Service = Szh010Service();
   final Sze010Service _sze010service = Sze010Service();
   final ScrollController _controller = ScrollController();
@@ -131,7 +131,7 @@ class _SolicitacaoScreenState extends State<SolicitacaoScreen> {
                   setState(() {
                     databaseSzh = {};
                     for (Szh010 szh010 in listSzh010) {
-                      databaseSzh[szh010.zh_dataini] = szh010;
+                      databaseSzh[szh010.r_e_c_n_o_field] = szh010;
                     }
                     databaseSzh.forEach((key, value) {
                       soma += 1;

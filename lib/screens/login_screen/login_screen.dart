@@ -4,13 +4,18 @@ import 'package:projeto_aucs/screens/commom/error_dialog.dart';
 import 'package:projeto_aucs/screens/commom/exception_dialog.dart';
 import 'package:projeto_aucs/services/auth_service.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   final AuthService authService = AuthService();
+  bool _passwordVsible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +36,7 @@ class LoginScreen extends StatelessWidget {
                       'assets/images/robot.gif',
                       fit: BoxFit.cover,
                     ),
-                  ), //Icon(
-                  //Icons.bookmark,
-                  //size: 64,
-                  //color: Colors.brown,
-                  //),
+                  ),
                   const Text(
                     "Japher Assessoria Contábil",
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -60,10 +61,27 @@ class LoginScreen extends StatelessWidget {
                   ),
                   TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(label: Text("Senha")),
+                    decoration: InputDecoration(
+                      label: const Text("Senha"),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _passwordVsible = !_passwordVsible;
+                          });
+                        },
+                        icon: Icon(
+                          _passwordVsible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
                     keyboardType: TextInputType.visiblePassword,
                     maxLength: 16,
-                    obscureText: true,
+                    obscureText: _passwordVsible
+                        ? false
+                        : true,
                   ),
                   ElevatedButton(
                       onPressed: () {
@@ -77,6 +95,10 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void changeVisible(BuildContext context) {
+    _passwordVsible = !_passwordVsible;
   }
 
   void tryLogin(BuildContext context) {

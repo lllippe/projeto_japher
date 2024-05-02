@@ -159,7 +159,7 @@ class _BancoHorasState extends State<BancoHoras> {
                                     children: [
                                       Padding(
                                         padding:
-                                            const EdgeInsets.only(left: 14.0),
+                                            const EdgeInsets.only(left: 8),
                                         child: TextField(
                                             controller: inicioController,
                                             style:
@@ -200,7 +200,7 @@ class _BancoHorasState extends State<BancoHoras> {
                                       ),
                                       Padding(
                                         padding:
-                                            const EdgeInsets.only(left: 14.0),
+                                            const EdgeInsets.only(left: 8),
                                         child: TextField(
                                             controller: fimController,
                                             style:
@@ -318,20 +318,42 @@ class _BancoHorasState extends State<BancoHoras> {
                                 ),
                                 (_isSearchReady)
                                     ? (_showSearch)
-                                      ? Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Saldo Inicial: $saldoInicial   |   '
+                                      ? SizedBox(
+                                        width: 370,
+                                        height: 70,
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                                padding: const EdgeInsets.all(2.0),
+                                                child: Text(
+                                                  'Saldo Inicial: $saldoInicial',
+                                                  style: GoogleFonts.acme(
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 23,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.blue),
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  softWrap: true,
+                                                ),
+                                              ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(2.0),
+                                              child: Text(
                                                 'Saldo Final: ${saldoInicial + saldoPeriodo}',
-                                            style: GoogleFonts.acme(
-                                              textStyle: const TextStyle(
-                                                  fontSize: 23,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.blue),
+                                                style: GoogleFonts.acme(
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 23,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.blue),
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                softWrap: true,
+                                              ),
                                             ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        )
+                                          ],
+                                        ),
+                                      )
                                       : const Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [

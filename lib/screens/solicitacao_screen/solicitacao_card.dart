@@ -22,7 +22,7 @@ class SolicitacaoCard extends StatefulWidget {
 }
 
 class _SolicitacaoCardState extends State<SolicitacaoCard> {
-  Map<String, Szh010> database = {};
+  Map<int, Szh010> database = {};
   int soma = 0;
   final Szh010Service _szh010Service = Szh010Service();
   final Sze010Service _sze010service = Sze010Service();
@@ -106,7 +106,7 @@ class _SolicitacaoCardState extends State<SolicitacaoCard> {
                   setState(() {
                     database = {};
                     for (Szh010 szh010 in listSzh010) {
-                      database[szh010.zh_dataini] = szh010;
+                      database[szh010.r_e_c_n_o_field] = szh010;
                     }
 
                     database.forEach((key, value) {

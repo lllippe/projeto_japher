@@ -4,6 +4,7 @@ import 'package:projeto_aucs/models/ferias.dart';
 import 'package:projeto_aucs/models/spi010.dart';
 import 'package:projeto_aucs/models/sze010.dart';
 import 'package:projeto_aucs/models/szh010.dart';
+import 'package:projeto_aucs/screens/add_screen/widgets/add_homeoffice_tile_list.dart';
 import 'package:projeto_aucs/screens/commom/error_dialog.dart';
 import 'package:projeto_aucs/screens/commom/menu_drawer.dart';
 import 'package:projeto_aucs/screens/commom/success_dialog.dart';
@@ -22,10 +23,11 @@ class AddHomeOfficeScreen extends StatefulWidget {
   final bool isEditing;
   final Spi010 spi010;
 
-  const AddHomeOfficeScreen({Key? key,
-    required this.isLoading,
-    required this.isEditing,
-    required this.spi010})
+  const AddHomeOfficeScreen(
+      {Key? key,
+      required this.isLoading,
+      required this.isEditing,
+      required this.spi010})
       : super(key: key);
 
   @override
@@ -38,10 +40,13 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
   final HomeOfficeService _homeOfficeService = HomeOfficeService();
   Map<String, String> database = {};
   Map<String, Sze010> databaseSze = {};
+  Map<String, Sze010> databaseSzeList = {};
   Map<int, FeriasSze> databaseVacation = {};
   Map<int, Szh010> databaseHomeOffice = {};
+  Map<String, int> lastRecno = {};
   List<TableRow> tableContainer = [];
   List<String> name = [];
+  List<Theme> listNames = [];
   int qtdeDias = 0;
   int diasDireito = 0;
   int diasSzh = 40;
@@ -61,12 +66,18 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
   bool _isloading = false;
   String matricula = '';
   DateTime time = DateTime.now();
+  List<String> _selectedItems = [];
+  bool isSelected = false;
+  String nameList = '';
+  int lastRecnoNum = 0;
+  int recnoRegister = 0;
 
   @override
   void initState() {
     super.initState();
     _isloading = widget.isLoading;
     getSze010();
+    getSzh010LastRecno();
   }
 
   @override
@@ -76,144 +87,174 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
 
     return (!_isloading)
         ? Scaffold(
-                appBar: AppBar(
-                  foregroundColor: Colors.black,
-                  title: const Text('Editar Home Office'),
-                  titleTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                  backgroundColor: Colors.greenAccent,
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: SingleChildScrollView(
-                    controller: _controller,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Row(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(left: 2.0),
-                                child: Text(
-                                  'Colaborador?',
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: DropdownButton<String>(
-                                  value: departamento,
-                                  icon: const Icon(Icons.arrow_downward),
-                                  elevation: 16,
-                                  style: const TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      color: Colors.deepPurple,
-                                      fontSize: 16),
-                                  items: name.map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: SizedBox(
-                                        width: 200,
-                                        child: Text(
-                                          value,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? value) {
-                                    // This is called when the user selects an item.
-                                    setState(() {
-                                      departamento = value!;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ), // Nome
-                        const Divider(
-                          height: 2,
-                          thickness: 3,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: TextField(
-                              controller: inicioController,
-                              style: const TextStyle(fontSize: 18),
-                              decoration: const InputDecoration(
-                                labelText: "Data: ",
-                              ),
-                              readOnly: true,
-                              onTap: () async {
-                                pickedDateInicio = await showDatePicker(
-                                  selectableDayPredicate: (DateTime date) {
-                                    if (date.weekday == DateTime.saturday ||
-                                        date.weekday == DateTime.sunday) {
-                                      return false;
-                                    }
-                                    return true;
-                                  },
-                                  context: context,
-                                  initialDate: initialDate,
-                                  firstDate: initialDate,
-                                  lastDate: lastDate,
-                                );
-
-                                if (pickedDateInicio != null) {
-                                  String formattedDate = DateFormat('dd/MM/yyyy')
-                                      .format(pickedDateInicio!);
-
-                                  setState(() {
-                                    inicioController.text =
-                                        formattedDate;
-                                    time = DateTime(int.parse(inicioController.text.substring(6, 10)),
-                                        int.parse(inicioController.text.substring(3, 5)),
-                                        int.parse(inicioController.text.substring(0, 2)));//set foratted date to TextField value.
-                                  });
-                                  primaryValidation();
-                                } else {
-                                  String formattedDate =
-                                      DateFormat('dd/MM/yyyy').format(initialDate);
-
-                                  setState(() {
-                                    formattedDate;
-                                  });
-                                }
-                              }),
-                        ), // Inicio Ferias
-                        Padding(
-                          padding: const EdgeInsets.only(top: 25.0, bottom: 30),
-                          child: ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.greenAccent),
+            appBar: AppBar(
+              foregroundColor: Colors.black,
+              title: const Text('Editar Home Office'),
+              titleTextStyle: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+              backgroundColor: Colors.greenAccent,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(12),
+              child: SingleChildScrollView(
+                controller: _controller,
+                child: Column(
+                  children: [
+                    // Padding(
+                    //   padding: const EdgeInsets.all(2.0),
+                    //   child: Row(
+                    //     children: [
+                    //       const Padding(
+                    //         padding: EdgeInsets.only(left: 2.0),
+                    //         child: Text(
+                    //           'Colaborador?',
+                    //           style: TextStyle(fontSize: 20),
+                    //         ),
+                    //       ),
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(left: 10.0),
+                    //         child: DropdownButton<String>(
+                    //           value: departamento,
+                    //           icon: const Icon(Icons.arrow_downward),
+                    //           elevation: 16,
+                    //           style: const TextStyle(
+                    //               overflow: TextOverflow.ellipsis,
+                    //               color: Colors.deepPurple,
+                    //               fontSize: 16),
+                    //           items: name.map<DropdownMenuItem<String>>(
+                    //               (String value) {
+                    //             return DropdownMenuItem<String>(
+                    //               value: value,
+                    //               child: SizedBox(
+                    //                 width: 200,
+                    //                 child: Text(
+                    //                   value,
+                    //                   overflow: TextOverflow.ellipsis,
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           }).toList(),
+                    //           onChanged: (String? value) {
+                    //             // This is called when the user selects an item.
+                    //             setState(() {
+                    //               departamento = value!;
+                    //             });
+                    //           },
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ), // Nome
+                    // const Divider(
+                    //   height: 2,
+                    //   thickness: 3,
+                    // ),
+                    Card(
+                      elevation: 4,
+                      shadowColor: Colors.grey,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: TextField(
+                            controller: inicioController,
+                            style: const TextStyle(fontSize: 18),
+                            decoration: const InputDecoration(
+                              labelText: "Data: ",
                             ),
-                            onPressed: () {
-                              validateHomeOffice(context);
-                            },
-                            child: Text(
-                              'Adicionar',
-                              style: GoogleFonts.acme(
-                                textStyle: const TextStyle(fontSize: 30),
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ), // Button Solicitar
-                      ],
+                            readOnly: true,
+                            onTap: () async {
+                              pickedDateInicio = await showDatePicker(
+                                selectableDayPredicate: (DateTime date) {
+                                  if (date.weekday == DateTime.saturday ||
+                                      date.weekday == DateTime.sunday) {
+                                    return false;
+                                  }
+                                  return true;
+                                },
+                                context: context,
+                                initialDate: initialDate,
+                                firstDate: initialDate,
+                                lastDate: lastDate,
+                              );
+
+                              if (pickedDateInicio != null) {
+                                String formattedDate = DateFormat('dd/MM/yyyy')
+                                    .format(pickedDateInicio!);
+
+                                setState(() {
+                                  inicioController.text = formattedDate;
+                                  time = DateTime(
+                                      int.parse(inicioController.text
+                                          .substring(6, 10)),
+                                      int.parse(inicioController.text
+                                          .substring(3, 5)),
+                                      int.parse(inicioController.text.substring(
+                                          0,
+                                          2))); //set foratted date to TextField value.
+                                });
+                                primaryValidation();
+                              } else {
+                                String formattedDate = DateFormat('dd/MM/yyyy')
+                                    .format(initialDate);
+
+                                setState(() {
+                                  formattedDate;
+                                });
+                              }
+                            }),
+                      ),
                     ),
-                  ),
+                    Card(
+                      elevation: 4,
+                      shadowColor: Colors.grey,
+                      child: SizedBox(
+                        height: 450,
+                        child: Scrollbar(
+                          child: Material(
+                            child: ListView(
+                              children: generateListTileBancoHoras(
+                                database: databaseSzeList,
+                                selectedItems: _selectedItems,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25.0, bottom: 30),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.greenAccent),
+                        ),
+                        onPressed: () {
+                          for (final element in _selectedItems) {
+                            lastRecnoNum = lastRecnoNum + 1;
+                            lastRecno[element] = lastRecnoNum;
+                          }
+                          validateHomeOffice(context);
+                        },
+                        child: Text(
+                          'Adicionar',
+                          style: GoogleFonts.acme(
+                            textStyle: const TextStyle(fontSize: 30),
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Button Solicitar
+                  ],
                 ),
-                drawer: menuDrawer(context),
-            )
+              ),
+            ),
+            drawer: menuDrawer(context),
+          )
         : Container(
-          color: Colors.white,
-          child: const Row(
+            color: Colors.white,
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Center(
@@ -221,77 +262,65 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
                 ),
               ],
             ),
-        );
+          );
   }
 
   void primaryValidation() {
-    String matriculaColab = '';
     String initialDate = inicioController.text.substring(6, 10) +
         inicioController.text.substring(3, 5) +
         inicioController.text.substring(0, 2);
 
-    databaseSze.forEach((key, value) {
-      if (value.ze_nome.trim() == departamento) {
-        matriculaColab = value.ze_mat;
+    _selectedItems.forEach((element) {
+      if (validation.searchUniqueName(element, initialDate)) {
+        ErrorDialog(context, 'Colaborador já cadastrado esse dia.');
+      }
+
+      if (validation.SearchColabVacation(element, time)) {
+        ErrorDialog(
+            context, 'Colaborador em férias não pode trabalhar presencial.');
       }
     });
-
-    if(validation.searchUniqueName(matriculaColab, initialDate)){
-      ErrorDialog(context,
-          'Colaborador já cadastrado esse dia.');
-    }
-
-    if(validation.SearchColabVacation(matriculaColab, time)){
-      ErrorDialog(context,
-          'Colaborador em férias não pode trabalhar presencial.');
-    }
   }
 
   void validateHomeOffice(BuildContext context) {
-    String matriculaColab = '';
     String initialDate = inicioController.text.substring(6, 10) +
         inicioController.text.substring(3, 5) +
         inicioController.text.substring(0, 2);
 
-    databaseSze.forEach((key, value) {
-      if (value.ze_nome.trim() == departamento) {
-        matriculaColab = value.ze_mat;
+    lastRecno.forEach((key, value) {
+      if (validation.searchUniqueName(key, initialDate)) {
+        ErrorDialog(context, 'Colaborador já cadastrado esse dia.');
+        validateColaborador = true;
+      } else {
+        validateColaborador = false;
       }
+
+      if (validation.SearchColabVacation(key, time)) {
+        ErrorDialog(
+            context, 'Colaborador em férias não pode trabalhar presencial.');
+        validateVacation = true;
+      } else {
+        validateVacation = false;
+      }
+
+      (validateColaborador || validateVacation)
+          ? ErrorDialog(
+              context, 'Existem erros que impedem a gravação, verificar!!')
+          : registerSzh010(context, key, value);
     });
-
-    if(validation.searchUniqueName(matriculaColab, initialDate)){
-      ErrorDialog(context,
-          'Colaborador já cadastrado esse dia.');
-      validateColaborador = true;
-    } else {
-      validateColaborador = false;
-    }
-
-    if(validation.SearchColabVacation(matriculaColab, time)){
-      ErrorDialog(context,
-          'Colaborador em férias não pode trabalhar presencial.');
-      validateVacation = true;
-    } else {
-      validateVacation = false;
-    }
-
-    (validateColaborador || validateVacation)
-        ? ErrorDialog(
-        context, 'Existem erros que impedem a gravação, verificar!!')
-        : registerSzh010(context);
   }
 
-  registerSzh010(BuildContext context) async {
+  registerSzh010(BuildContext context, String matricula, int recno) async {
     SharedPreferences.getInstance().then((prefs) {
       String? group = prefs.getString('group');
       String? name = prefs.getString('first_name');
 
-      String matricula = '';
       String dpto = '';
 
+      print('matricula de cadastro: $matricula');
+
       databaseSze.forEach((key, value) {
-        if (value.ze_nome.trim() == departamento) {
-          matricula = value.ze_mat;
+        if (value.ze_mat.trim() == matricula) {
           dpto = value.ze_depto;
         }
       });
@@ -320,7 +349,7 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
           zh_dtrecap: '',
           zh_integra: '2',
           zh_depto: dpto,
-          r_e_c_n_o_field: 0,
+          r_e_c_n_o_field: recno,
           r_e_c_d_e_l_field: 0,
           d_e_l_e_t_field: '');
 
@@ -360,7 +389,7 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
           id != null &&
           group != null) {
         _homeOfficeService.getAll().then((List<Szh010> listSzh010) {
-          if(mounted){
+          if (mounted) {
             setState(() {
               databaseHomeOffice = {};
               for (Szh010 szh010 in listSzh010) {
@@ -384,25 +413,60 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
         _sze010service.getAll().then((List<Sze010> listSze010) {
           if (mounted) {
             setState(() {
+              databaseSzeList = {};
               for (Sze010 sze010 in listSze010) {
                 if (sze010.ze_nome.trim() == departamento) {
                   matricula = sze010.ze_mat;
                 }
                 if (group == '1') {
                   name.add(sze010.ze_nome.trim());
-                } else if(group == '2') {
+                  databaseSzeList[sze010.ze_mat] = sze010;
+                } else if (group == '2') {
                   if (sze010.ze_depto == depto) {
                     name.add(sze010.ze_nome.trim());
+                    databaseSzeList[sze010.ze_mat] = sze010;
                   }
-                } else if(group == '3'){
-                  if(id == sze010.ze_mat){
+                } else if (group == '3') {
+                  if (id == sze010.ze_mat) {
                     name.add(sze010.ze_nome.trim());
+                    databaseSzeList[sze010.ze_mat] = sze010;
                   }
                 }
                 databaseSze[sze010.ze_mat] = sze010;
               }
               departamento = name.first;
               _isloading = false;
+            });
+          }
+        });
+      } else {
+        Navigator.pushReplacementNamed(context, 'login');
+      }
+    });
+  }
+
+  void getSzh010LastRecno() async {
+    SharedPreferences.getInstance().then((prefs) {
+      String? firstName = prefs.getString('first_name');
+      String? lastName = prefs.getString('last_name');
+      String? id = prefs.getString('id');
+      String? group = prefs.getString('group');
+
+      if (firstName != null &&
+          lastName != null &&
+          id != null &&
+          group != null) {
+        recnoRegister = 0;
+
+        _homeOfficeService.getLastRecno().then((List<Szh010> listSzh010) {
+          if (mounted) {
+            setState(() {
+              for (Szh010 szh010 in listSzh010) {
+                if (recnoRegister == 0) {
+                  lastRecnoNum = szh010.r_e_c_n_o_field;
+                }
+                recnoRegister++;
+              }
             });
           }
         });

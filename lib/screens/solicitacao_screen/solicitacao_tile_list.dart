@@ -2,7 +2,7 @@ import 'package:projeto_aucs/models/szh010.dart';
 import 'package:projeto_aucs/screens/solicitacao_screen/Solicitacao_tile_card.dart';
 
 List<SolicitacaoTileCard> generateListTileSolicitacao({
-  required Map<String, Szh010> database,
+  required Map<int, Szh010> database,
   required matricula,
 }) {
 

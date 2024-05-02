@@ -118,6 +118,62 @@ class HomeOfficeService {
     return result;
   }
 
+  Future<List<Szh010>> searchDay(String Date) async {
+    String user = await getUser();
+    String password = await getPassword();
+    final bytes = utf8.encode('$user:$password');
+    final base64Str = base64.encode(bytes);
+    http.Response response = await client.get(
+      Uri.parse("${WebClient.url}home_office/?search=$Date"),
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Basic $base64Str',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      verifyException(json.decode(response.body));
+    }
+
+    List<Szh010> result = [];
+
+    List<dynamic> jsonList = json.decode(response.body);
+
+    for (var jsonMap in jsonList) {
+      result.add(Szh010.fromMap(jsonMap));
+    }
+
+    return result;
+  }
+
+  Future<List<Szh010>> getLastRecno() async {
+    String user = await getUser();
+    String password = await getPassword();
+    final bytes = utf8.encode('$user:$password');
+    final base64Str = base64.encode(bytes);
+    http.Response response = await client.get(
+      Uri.parse("${WebClient.url}$resource?ordering=-r_e_c_n_o_field"),
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Basic $base64Str',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      verifyException(json.decode(response.body));
+    }
+
+    List<Szh010> result = [];
+
+    List<dynamic> jsonList = json.decode(response.body);
+
+    for (var jsonMap in jsonList) {
+      result.add(Szh010.fromMap(jsonMap));
+    }
+
+    return result;
+  }
+
   Future<bool> remove(int id) async {
     String user = await getUser();
     String password = await getPassword();

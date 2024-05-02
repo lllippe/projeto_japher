@@ -4,7 +4,7 @@ import 'package:projeto_aucs/models/spi010.dart';
 import 'package:projeto_aucs/models/sze010.dart';
 import 'package:projeto_aucs/models/szh010.dart';
 import 'package:projeto_aucs/screens/add_screen/add_homeoffice_screen.dart';
-import 'package:projeto_aucs/screens/homeoffice_screen/homeoffice_screen_list.dart';
+import 'package:projeto_aucs/screens/homeoffice_screen/homeoffice_card.dart';
 import 'package:projeto_aucs/services/homeoffice_service.dart';
 import 'package:projeto_aucs/services/sze010_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,19 +50,11 @@ class _HomeOfficeScreenState extends State<HomeOfficeScreen> {
     return (!_isloading)
         ? Scaffold(
             body: Scrollbar(
+              controller: listScrollController,
               thumbVisibility: true,
               thickness: 10,
               child: (database.length > 0)
-                ? SingleChildScrollView(
-                    child: ListView(
-                      shrinkWrap: true,
-                      controller: listScrollController,
-                      children: generateListHomeOfficeCards(
-                        database: database,
-                        refreshFunction: refresh,
-                      ),
-                    ),
-                  )
+                ? const HomeOfficeCard()
                 : ListTile(
                     title: Text(
                     'Nenhum colaborador cadastrado para trabalho presencial',

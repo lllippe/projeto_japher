@@ -4,19 +4,25 @@ import 'package:projeto_aucs/screens/solicitacao_screen/solicitacao_card.dart';
 
 List<SolicitacaoCard> generateListSolicitacaoCards({
   required Map<String, Sze010> database,
-  required Map<String, Szh010> databaseSzh,
+  required Map<int, Szh010> databaseSzh,
 }) {
   List<SolicitacaoCard> list = [];
+  List<String> containsName = [];
 
   databaseSzh.forEach((key, valueSzh) {
     database.forEach((key, value) {
       if (value.ze_mat == valueSzh.zh_mat) {
-        list.add(
-          SolicitacaoCard(
-            sze010: value,
-            szh010:valueSzh,
-          ),
-        );
+        if(!containsName.contains(value.ze_mat)){
+          list.add(
+            SolicitacaoCard(
+              sze010: value,
+              szh010:valueSzh,
+            ),
+          );
+        }
+        print(list);
+        print(containsName);
+        containsName.add(value.ze_mat);
       }
     });
   });

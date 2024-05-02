@@ -48,20 +48,24 @@ class _FeriasWarningScreenState extends State<FeriasWarningScreen> {
         ),
       );
     } else {
-      return ListTile(
-        title: Row(
-          children: [
-            Text(
-              'Todo o período foi agendado!',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.acme(
-                textStyle: const TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black),
+      return Card(
+        shadowColor: Colors.greenAccent,
+        elevation: 3,
+        child: ListTile(
+          title: Row(
+            children: [
+              Text(
+                'Todo o período foi agendado!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.acme(
+                  textStyle: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.black),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
