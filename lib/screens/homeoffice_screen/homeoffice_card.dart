@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:projeto_aucs/models/home_office_list_names.dart';
 import 'package:projeto_aucs/models/sqb010.dart';
 import 'package:projeto_aucs/models/sze010.dart';
 import 'package:projeto_aucs/models/szh010.dart';
@@ -20,7 +21,7 @@ class HomeOfficeCard extends StatefulWidget {
 
 class _HomeOfficeCardState extends State<HomeOfficeCard> {
   Map<String, Sze010> database = {};
-  Map<String, Szh010> databaseSzh = {};
+  Map<int, HomeOfficeListNames> databaseSzh = {};
   int soma = 0;
 
   final HomeOfficeService _homeOfficeService = HomeOfficeService();
@@ -55,13 +56,14 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
   Widget _buildPanel() {
     DateTime lastDate = DateTime.now().add(const Duration(days: 90));
     DateTime initialDate = DateTime.now().subtract(const Duration(days: 90));
-
+    var deviceData = MediaQuery.of(context);
+    double width_screen = deviceData.size.width;
     return Row(
       children: [
         Column(
           children: [
             SizedBox(
-              width: 390,
+              width: width_screen - 10,
               height: 150,
               child: Card(
                 child: Column(
@@ -130,7 +132,7 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
                           databaseSzh.isEmpty
                               ? Card(
                                   child: SizedBox(
-                                    width: 380,
+                                    width: width_screen - 20,
                                     height: 40,
                                     child: Text(
                                       'Ninguém cadastrado presencial',
@@ -147,7 +149,7 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
                                 )
                               : Card(
                                   child: SizedBox(
-                                    width: 380,
+                                    width: width_screen - 20,
                                     height: 40,
                                     child: Text(
                                       'Presencial dia: $dateSearch',
@@ -164,7 +166,7 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
                                 ),
                           Card(
                             child: SizedBox(
-                              width: 380,
+                              width: width_screen - 20,
                               height: 400,
                               child: Scrollbar(
                                 controller: _controller,
@@ -175,7 +177,6 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
                                   controller: _listScrollController,
                                   children: generateListTilHomeOffice(
                                     database: databaseSzh,
-                                    databaseSze: database,
                                   ),
                                 ),
                               ),
@@ -193,7 +194,7 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
                       )
                 : Card(
                   child: SizedBox(
-                      width: 380,
+                      width: width_screen - 20,
                       height: 40,
                       child: Text(
                         returnSearch,
@@ -279,11 +280,11 @@ class _HomeOfficeCardState extends State<HomeOfficeCard> {
             inicioController.text.substring(3, 5) +
             inicioController.text.substring(0, 2);
 
-        _homeOfficeService.searchDay(inicio).then((List<Szh010> listSzh010) {
+        _homeOfficeService.searchDay(inicio).then((List<HomeOfficeListNames> listSzh010) {
           setState(() {
             databaseSzh = {};
-            for (Szh010 szh010 in listSzh010) {
-              databaseSzh[szh010.zh_mat] = szh010;
+            for (HomeOfficeListNames szh010 in listSzh010) {
+              databaseSzh[soma] = szh010;
               soma += 1;
             }
           });

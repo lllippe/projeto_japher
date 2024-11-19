@@ -56,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var deviceData = MediaQuery.of(context);
+    double width_screen = deviceData.size.width;
     return Scaffold(
             appBar: AppBar(
               foregroundColor: Colors.black,
@@ -76,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             body: SizedBox(
-                width: 400,
+                width: width_screen,
                 child: _widgetOptions
                     .elementAt(_selectedIndex) //ListTileSelectExample(),
                 ),

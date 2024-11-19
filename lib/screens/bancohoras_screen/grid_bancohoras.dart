@@ -89,7 +89,8 @@ class _BancoHorasState extends State<BancoHoras> {
     final ScrollController _listScrollController = ScrollController();
     DateTime lastDate = DateTime.now();
     DateTime initialDate = DateTime.now().subtract(const Duration(days: 90));
-
+    var deviceData = MediaQuery.of(context);
+    double width_screen = deviceData.size.width;
     return (!_isloading)
         ? DefaultTabController(
             length: 2, // This is the number of tabs.
@@ -139,7 +140,7 @@ class _BancoHorasState extends State<BancoHoras> {
                 },
                 body: SizedBox(
                   height: 400,
-                  width: 400,
+                  width: width_screen,
                   child: TabBarView(
                     children: <Widget>[
                       AddBancoHorasScreen(
@@ -153,7 +154,7 @@ class _BancoHorasState extends State<BancoHoras> {
                             Column(
                               children: [
                                 SizedBox(
-                                  width: 370,
+                                  width: width_screen - 30,
                                   height: 250,
                                   child: Column(
                                     children: [
@@ -271,7 +272,7 @@ class _BancoHorasState extends State<BancoHoras> {
                                                       String>(
                                                     value: value,
                                                     child: SizedBox(
-                                                      width: 200,
+                                                      width: width_screen - 200,
                                                       child: Text(
                                                         value,
                                                         overflow: TextOverflow
@@ -319,7 +320,7 @@ class _BancoHorasState extends State<BancoHoras> {
                                 (_isSearchReady)
                                     ? (_showSearch)
                                       ? SizedBox(
-                                        width: 370,
+                                        width: width_screen - 30,
                                         height: 70,
                                         child: Column(
                                           children: [
@@ -366,7 +367,7 @@ class _BancoHorasState extends State<BancoHoras> {
                                 (_isSearchReady)
                                     ? (_showSearch)
                                       ? SizedBox(
-                                          width: 380,
+                                          width: width_screen - 20,
                                           height: 400,
                                           child: ListView(
                                             physics: const NeverScrollableScrollPhysics(),
@@ -390,7 +391,7 @@ class _BancoHorasState extends State<BancoHoras> {
                                         ],
                                       )
                                     : SizedBox(
-                                        width: 250,
+                                        width: width_screen - 150,
                                         height: 200,
                                         child: Text(
                                           returnSearch,

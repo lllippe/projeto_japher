@@ -80,7 +80,8 @@ class _PontoEletronicoState extends State<PontoEletronico> {
     final ScrollController _listScrollController = ScrollController();
     DateTime lastDate = DateTime.now().add(const Duration(days: 10));
     DateTime initialDate = DateTime.now().subtract(const Duration(days: 90));
-
+    var deviceData = MediaQuery.of(context);
+    double width_screen = deviceData.size.width;
     return (!_isloading)
         ? DefaultTabController(
             length: 2, // This is the number of tabs.
@@ -130,7 +131,7 @@ class _PontoEletronicoState extends State<PontoEletronico> {
                 },
                 body: SizedBox(
                   height: 400,
-                  width: 400,
+                  width: width_screen,
                   child: TabBarView(
                     children: <Widget>[
                       const AddPontoEletronicoScreen(
@@ -142,7 +143,7 @@ class _PontoEletronicoState extends State<PontoEletronico> {
                             Column(
                               children: [
                                 SizedBox(
-                                  width: 370,
+                                  width: width_screen - 30,
                                   height: 300,
                                   child: Column(
                                     children: [
@@ -261,7 +262,7 @@ class _PontoEletronicoState extends State<PontoEletronico> {
                                                       String>(
                                                     value: value,
                                                     child: SizedBox(
-                                                      width: 200,
+                                                      width: width_screen - 100,
                                                       child: Text(
                                                         value,
                                                         overflow: TextOverflow
@@ -309,7 +310,7 @@ class _PontoEletronicoState extends State<PontoEletronico> {
                                 (_isSearchReady)
                                     ? (_showSearch)
                                       ? SizedBox(
-                                          width: 380,
+                                          width: width_screen - 20,
                                           height: 500,
                                           child: ListView(
                                             physics: const NeverScrollableScrollPhysics(),
@@ -329,7 +330,7 @@ class _PontoEletronicoState extends State<PontoEletronico> {
                                           ],
                                         )
                                     : SizedBox(
-                                        width: 250,
+                                        width: width_screen - 150,
                                         height: 200,
                                         child: Text(
                                           returnSearch,

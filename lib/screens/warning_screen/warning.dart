@@ -164,15 +164,18 @@ class WarningState extends State<Warning> with TickerProviderStateMixin {
                               : Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        'Todo o período já foi marcado!',
-                                        overflow: TextOverflow.visible,
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.acme(
-                                          textStyle: const TextStyle(
-                                              fontSize: 23,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.black),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(bottom: 16.0),
+                                        child: Text(
+                                          'Todo o período já foi marcado!',
+                                          overflow: TextOverflow.visible,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.acme(
+                                            textStyle: const TextStyle(
+                                                fontSize: 23,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.black),
+                                          ),
                                         ),
                                       ),
                                     ),

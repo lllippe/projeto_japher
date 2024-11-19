@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:projeto_aucs/models/email_departamento.dart';
 import 'package:projeto_aucs/models/srf010.dart';
 import 'package:projeto_aucs/models/srh010.dart';
 import 'package:projeto_aucs/models/sze010_falta_dias.dart';
@@ -9,12 +10,15 @@ import 'package:projeto_aucs/screens/commom/menu_drawer.dart';
 import 'package:projeto_aucs/screens/commom/success_dialog.dart';
 import 'package:projeto_aucs/screens/home_screen/home_screen.dart';
 import 'package:projeto_aucs/screens/szh010_screen/szh010_screen.dart';
+import 'package:projeto_aucs/services/sqb010_service.dart';
 import 'package:projeto_aucs/services/srf010_service.dart';
 import 'package:projeto_aucs/services/srh010_service.dart';
 import 'package:projeto_aucs/services/szh010_service.dart';
 import 'package:projeto_aucs/validations/dateValidation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 const List<String> active = <String>['Sim', 'Não'];
 
@@ -757,10 +761,28 @@ class _AddSzh010ScreenState extends State<AddSzh010Screen> {
 
   registerSzh010(BuildContext context) async {
     Szh010Service szh010Service = Szh010Service();
+    Sqb010Service _getMail = Sqb010Service();
+    String mailTo = '';
+
+    _getMail.getEmail(widget.sze010.ze_depto).then((List<EmailDpto> listEmailDpto) {
+        for (EmailDpto emailDpto in listEmailDpto){
+          mailTo = emailDpto.qb_email;
+        }
+    });
 
     SharedPreferences.getInstance().then((prefs) {
       String? group = prefs.getString('group');
       String? name = prefs.getString('first_name');
+      String emailMessage = '${widget.sze010.ze_nome.trim()} fez a requisição do '
+          'seguinte período de férias:\n'
+          'Inicio: ${inicioController.text.substring(0, 2)}/'
+          '${inicioController.text.substring(3, 5)}/'
+          '${inicioController.text.substring(6, 10)}\n'
+          'Fim: ${fimController.text.substring(0, 2)}/'
+          '${fimController.text.substring(3, 5)}/'
+          '${fimController.text.substring(6, 10)}\n'
+          'Totalizando: $qtdeDias dia(s)\n'
+          'Entre no aplicativo para aprovar ou rejeitar essa solicitação.';
 
       Szh010 internalSzh010 = Szh010(
           zh_mat: widget.sze010.ze_mat,
@@ -788,6 +810,7 @@ class _AddSzh010ScreenState extends State<AddSzh010Screen> {
 
       szh010Service.register(internalSzh010).then((value) {
         if (value) {
+          sendEmail(widget.sze010.ze_nome, emailMessage, mailTo);
           Navigator.pop(context, DisposeStatus.success);
           if (group == '1') {
             Navigator.push(
@@ -1316,6 +1339,28 @@ class _AddSzh010ScreenState extends State<AddSzh010Screen> {
         }
       });
     });
+  }
+
+  Future<void> sendEmail(String name, String messageToSend, String mailto) async {
+    String username = 'japher_ferias@outlook.com';
+    String password = 'J4ph3rF3ri4s';
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy – hh:mm').format(now);
+
+    var message = Message();
+    message.from = Address(username.toString());
+    message.recipients.add(mailto);
+    //message.ccRecipients.add('felipe.pelissari@gmail.com');
+    message.subject = 'Requisição de férias - $name';
+    message.text = messageToSend;
+
+    var smtpServer = hotmail(username, password);
+
+    try {
+      final sendReport = await send(message, smtpServer);
+    } on MailerException catch (e) {
+      String error = e.toString();
+    }
   }
 }
 

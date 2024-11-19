@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:projeto_aucs/models/home_office_list_names.dart';
+import 'package:projeto_aucs/models/last_recno_szh.dart';
 import 'package:projeto_aucs/services/web_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -118,13 +120,13 @@ class HomeOfficeService {
     return result;
   }
 
-  Future<List<Szh010>> searchDay(String Date) async {
+  Future<List<HomeOfficeListNames>> searchDay(String Date) async {
     String user = await getUser();
     String password = await getPassword();
     final bytes = utf8.encode('$user:$password');
     final base64Str = base64.encode(bytes);
     http.Response response = await client.get(
-      Uri.parse("${WebClient.url}home_office/?search=$Date"),
+      Uri.parse("${WebClient.url}home_office_busca_dia/$Date"),
       headers: {
         'Content-type': 'application/json',
         'Authorization': 'Basic $base64Str',
@@ -135,24 +137,24 @@ class HomeOfficeService {
       verifyException(json.decode(response.body));
     }
 
-    List<Szh010> result = [];
+    List<HomeOfficeListNames> result = [];
 
     List<dynamic> jsonList = json.decode(response.body);
 
     for (var jsonMap in jsonList) {
-      result.add(Szh010.fromMap(jsonMap));
+      result.add(HomeOfficeListNames.fromMap(jsonMap));
     }
 
     return result;
   }
 
-  Future<List<Szh010>> getLastRecno() async {
+  Future<List<LastRecnoSzh>> getLastRecno() async {
     String user = await getUser();
     String password = await getPassword();
     final bytes = utf8.encode('$user:$password');
     final base64Str = base64.encode(bytes);
     http.Response response = await client.get(
-      Uri.parse("${WebClient.url}$resource?ordering=-r_e_c_n_o_field"),
+      Uri.parse("${WebClient.url}home_office_last_recno/"),
       headers: {
         'Content-type': 'application/json',
         'Authorization': 'Basic $base64Str',
@@ -163,12 +165,12 @@ class HomeOfficeService {
       verifyException(json.decode(response.body));
     }
 
-    List<Szh010> result = [];
+    List<LastRecnoSzh> result = [];
 
     List<dynamic> jsonList = json.decode(response.body);
 
     for (var jsonMap in jsonList) {
-      result.add(Szh010.fromMap(jsonMap));
+      result.add(LastRecnoSzh.fromMap(jsonMap));
     }
 
     return result;

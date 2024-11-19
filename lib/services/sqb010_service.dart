@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:projeto_aucs/services/web_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/email_departamento.dart';
 import '../models/sqb010.dart';
 
 class Sqb010Service {
@@ -85,6 +86,34 @@ class Sqb010Service {
 
     for (var jsonMap in jsonList) {
       result.add(Sqb010.fromMap(jsonMap));
+    }
+
+    return result;
+  }
+
+  Future<List<EmailDpto>> getEmail(String dpto) async {
+    String user = await getUser();
+    String password = await getPassword();
+    final bytes = utf8.encode('$user:$password');
+    final base64Str = base64.encode(bytes);
+    http.Response response = await client.get(
+      Uri.parse("${WebClient.url}departamento_email/$dpto"),
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Basic $base64Str',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      verifyException(json.decode(response.body));
+    }
+
+    List<EmailDpto> result = [];
+
+    List<dynamic> jsonList = json.decode(response.body);
+
+    for (var jsonMap in jsonList) {
+      result.add(EmailDpto.fromMap(jsonMap));
     }
 
     return result;

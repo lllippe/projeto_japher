@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:projeto_aucs/models/sze010.dart';
 import 'package:projeto_aucs/models/szh010.dart';
 import 'package:projeto_aucs/screens/commom/error_dialog.dart';
 import 'package:projeto_aucs/screens/commom/success_dialog.dart';
 import 'package:projeto_aucs/screens/solicitacao_screen/solicitacao_screen.dart';
+import 'package:projeto_aucs/services/sze010_service.dart';
 import 'package:projeto_aucs/services/szh010_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class SolicitacaoTileCard extends StatefulWidget {
   final Szh010? szh010;
@@ -74,6 +78,27 @@ class _SolicitacaoTileCardState extends State<SolicitacaoTileCard> {
 
   approveSolicitation(BuildContext context) async {
     Szh010Service szh010service = Szh010Service();
+    Sze010Service sze010service = Sze010Service();
+    String nameColab = '';
+    String mailSendTo = '';
+
+    sze010service.getId(widget.szh010!.zh_mat).then((List<Sze010> listSze010) {
+      for(Sze010 sze010 in listSze010){
+        nameColab = sze010.ze_nome.trim();
+        mailSendTo = sze010.ze_email.trim();
+      }
+    });
+
+    String emailMessage = '$nameColab, '
+        'a requisição do seguinte período de férias:\n'
+        'Inicio: ${widget.szh010!.zh_dataini.substring(6, 8)}/'
+        '${widget.szh010!.zh_dataini.substring(4, 6)}/'
+        '${widget.szh010!.zh_dataini.substring(0, 4)}\n'
+        'Fim: ${widget.szh010!.zh_datafim.substring(6, 8)}/'
+        '${widget.szh010!.zh_datafim.substring(4, 6)}/'
+        '${widget.szh010!.zh_dataini.substring(0, 4)}\n'
+        'Totalizando: ${widget.szh010!.zh_diasfer.round()} dia(s) foi aprovada!';
+
     Szh010 internalSzh010 = Szh010(
         zh_mat: widget.szh010!.zh_mat,
         zh_inipaq: widget.szh010!.zh_inipaq,
@@ -107,6 +132,7 @@ class _SolicitacaoTileCardState extends State<SolicitacaoTileCard> {
           .edit(widget.szh010!.r_e_c_n_o_field, internalSzh010)
           .then((value) {
         if (value) {
+          sendEmail(nameColab, emailMessage, mailSendTo);
           Navigator.pop(context, DisposeStatus.success);
           Navigator.push(
             context,
@@ -127,6 +153,26 @@ class _SolicitacaoTileCardState extends State<SolicitacaoTileCard> {
 
   rejectSolicitation(BuildContext context) async {
     Szh010Service szh010service = Szh010Service();
+    Sze010Service sze010service = Sze010Service();
+    String nameColab = '';
+    String mailSendTo = '';
+
+    sze010service.getId(widget.szh010!.zh_mat).then((List<Sze010> listSze010) {
+      for(Sze010 sze010 in listSze010){
+        nameColab = sze010.ze_nome.trim();
+        mailSendTo = sze010.ze_email.trim();
+      }
+    });
+
+    String emailMessage = '$nameColab, '
+        'a requisição do seguinte período de férias:\n'
+        'Inicio: ${widget.szh010!.zh_dataini.substring(6, 8)}/'
+        '${widget.szh010!.zh_dataini.substring(4, 6)}/'
+        '${widget.szh010!.zh_dataini.substring(0, 4)}\n'
+        'Fim: ${widget.szh010!.zh_datafim.substring(6, 8)}/'
+        '${widget.szh010!.zh_datafim.substring(4, 6)}/'
+        '${widget.szh010!.zh_dataini.substring(0, 4)}\n'
+        'Totalizando: ${widget.szh010!.zh_diasfer.round()} dia(s) foi rejeitada!';
 
     Szh010 internalSzh010 = Szh010(
         zh_mat: widget.szh010!.zh_mat,
@@ -161,6 +207,7 @@ class _SolicitacaoTileCardState extends State<SolicitacaoTileCard> {
           .edit(widget.szh010!.r_e_c_n_o_field, internalSzh010)
           .then((value) {
         if (value) {
+          sendEmail(nameColab, emailMessage, mailSendTo);
           Navigator.pop(context, DisposeStatus.success);
           Navigator.push(
             context,
@@ -177,6 +224,27 @@ class _SolicitacaoTileCardState extends State<SolicitacaoTileCard> {
         }
       });
     });
+  }
+
+  Future<void> sendEmail(String name, String messageToSend, String mailto) async {
+    String username = 'japher_ferias@outlook.com';
+    String password = 'J4ph3rF3ri4s';
+    DateTime now = DateTime.now();
+
+    var message = Message();
+    message.from = Address(username.toString());
+    message.recipients.add(mailto);
+    //message.ccRecipients.add('felipe.pelissari@gmail.com');
+    message.subject = 'Requisição de férias - $name';
+    message.text = messageToSend;
+
+    var smtpServer = hotmail(username, password);
+
+    try {
+      final sendReport = await send(message, smtpServer);
+    } on MailerException catch (e) {
+      String error = e.toString();
+    }
   }
 }
 

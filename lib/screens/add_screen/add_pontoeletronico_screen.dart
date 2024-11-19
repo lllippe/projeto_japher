@@ -65,6 +65,8 @@ class _AddPontoEletronicoScreenState extends State<AddPontoEletronicoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var deviceData = MediaQuery.of(context);
+    double width_screen = deviceData.size.width;
     return (!_isloading)
         ? Scaffold(
             body: Padding(
@@ -99,7 +101,7 @@ class _AddPontoEletronicoScreenState extends State<AddPontoEletronicoScreen> {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: SizedBox(
-                                    width: 200,
+                                    width: width_screen - 200,
                                     child: Text(
                                       value,
                                       overflow: TextOverflow.ellipsis,
@@ -128,7 +130,7 @@ class _AddPontoEletronicoScreenState extends State<AddPontoEletronicoScreen> {
                                 border: Border.all(width: 2.0, color: Colors.black),
                                 color: Colors.black,
                                 shape: BoxShape.circle),
-                            width: 230,
+                            width: width_screen - 170,
                             height: 230,
                             isLive: true,
                             hourHandColor: Colors.white70,
@@ -172,7 +174,7 @@ class _AddPontoEletronicoScreenState extends State<AddPontoEletronicoScreen> {
                     ),
                     (_isRegisterReady)
                     ? SizedBox(
-                      width: 400,
+                      width: width_screen,
                       height: 200,
                       child: Text(
                         returnRegister,

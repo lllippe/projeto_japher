@@ -61,6 +61,7 @@ class _Sze010TileCardState extends State<Sze010TileCard> {
       ze_depto: '',
       ze_conveni: '',
       ze_niver: '',
+      ze_email: '',
       r_e_c_n_o_field: 0,
     );
 

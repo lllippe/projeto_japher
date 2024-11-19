@@ -53,6 +53,7 @@ class _AddBancoHorasScreenState extends State<AddBancoHorasScreen> {
   bancoHorasValidation validation = bancoHorasValidation();
   var departamento;
   bool _isloading = false;
+  String directory = '';
 
   @override
   void initState() {
@@ -375,12 +376,19 @@ class _AddBancoHorasScreenState extends State<AddBancoHorasScreen> {
                             ),
                             readOnly: true,
                             onTap: () async {
-                              pickedDateInicio = await showDatePicker(
-                                context: context,
-                                initialDate: initialDate,
-                                firstDate: firstDate,
-                                lastDate: lastDate,
-                              );
+                              directory == '000002' || directory == '000001'
+                              ? pickedDateInicio = await showDatePicker(
+                                  context: context,
+                                  initialDate: initialDate,
+                                  firstDate: firstDate,
+                                  lastDate: lastDate,
+                                )
+                              : pickedDateInicio = await showDatePicker(
+                                  context: context,
+                                  initialDate: lastDate,
+                                  firstDate: lastDate,
+                                  lastDate: lastDate,
+                                );
 
                               if (pickedDateInicio != null) {
                                 String formattedDate = DateFormat('dd/MM/yyyy')
@@ -589,6 +597,7 @@ class _AddBancoHorasScreenState extends State<AddBancoHorasScreen> {
           lastName != null &&
           id != null &&
           group != null) {
+        directory = id;
         _sze010service.getId(id).then((List<Sze010> listSze010) {
           if (mounted) {
             setState(() {

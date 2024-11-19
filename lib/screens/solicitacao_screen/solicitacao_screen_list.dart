@@ -20,8 +20,6 @@ List<SolicitacaoCard> generateListSolicitacaoCards({
             ),
           );
         }
-        print(list);
-        print(containsName);
         containsName.add(value.ze_mat);
       }
     });

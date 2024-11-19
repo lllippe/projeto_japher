@@ -783,6 +783,7 @@ class _AddSze010ScreenState extends State<AddSze010Screen> {
           ze_conveni: zeConveniController.text.substring(6, 10) +
               zeConveniController.text.substring(3, 5) +
               zeConveniController.text.substring(0, 2),
+          ze_email: widget.sze010.ze_email,
           r_e_c_n_o_field: widget.sze010.r_e_c_n_o_field,
         );
 
@@ -831,6 +832,7 @@ class _AddSze010ScreenState extends State<AddSze010Screen> {
           ze_niver: '2000${zeNiverController.text.substring(3, 5)}'
               '${zeNiverController.text.substring(0, 2)}',
           ze_conveni: '00000000',
+          ze_email: '',
           r_e_c_n_o_field: 0,
         );
 

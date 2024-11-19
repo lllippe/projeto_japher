@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:projeto_aucs/models/ferias.dart';
+import 'package:projeto_aucs/models/quem_esta_ferias.dart';
 import 'package:projeto_aucs/services/web_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,34 @@ class FeriasService {
 
     for (var jsonMap in jsonList) {
       result.add(FeriasSze.fromMap(jsonMap));
+    }
+
+    return result;
+  }
+
+  Future<List<QuemEstaFerias>> getListVacation() async {
+    String user = await getUser();
+    String password = await getPassword();
+    final bytes = utf8.encode('$user:$password');
+    final base64Str = base64.encode(bytes);
+    http.Response response = await client.get(
+      Uri.parse("${WebClient.url}quem_esta_ferias/"),
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Basic $base64Str',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      verifyException(json.decode(response.body));
+    }
+
+    List<QuemEstaFerias> result = [];
+
+    List<dynamic> jsonList = json.decode(response.body);
+
+    for (var jsonMap in jsonList) {
+      result.add(QuemEstaFerias.fromMap(jsonMap));
     }
 
     return result;

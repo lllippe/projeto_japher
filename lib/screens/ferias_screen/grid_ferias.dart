@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_aucs/models/ferias.dart';
 import 'package:projeto_aucs/models/periodos.dart';
+import 'package:projeto_aucs/models/quem_esta_ferias.dart';
 import 'package:projeto_aucs/models/srh010.dart';
 import 'package:projeto_aucs/models/sze010.dart';
 import 'package:projeto_aucs/models/sze010_falta_dias.dart';
@@ -38,7 +39,7 @@ class _FeriasState extends State<Ferias> {
   final Srh010Service _feriasColaboradorService = Srh010Service();
   final Srh010FaltaDiasService _srh010FaltaDiasService =
       Srh010FaltaDiasService();
-  Map<String, FeriasSze> databaseFerias = {};
+  Map<String, QuemEstaFerias> databaseFerias = {};
   Map<String, Sze010> databaseColaboradores = {};
   Map<String, Sze010FaltaDias> databaseFaltaDias = {};
   Map<String, Periodos> databasePeriodos = {};
@@ -61,7 +62,8 @@ class _FeriasState extends State<Ferias> {
   @override
   Widget build(BuildContext context) {
     final ScrollController _listScrollController = ScrollController();
-
+    var deviceData = MediaQuery.of(context);
+    double width_screen = deviceData.size.width;
     return (!_isloading)
         ? DefaultTabController(
             length: 3, // This is the number of tabs.
@@ -114,7 +116,7 @@ class _FeriasState extends State<Ferias> {
                 },
                 body: SizedBox(
                   height: 400,
-                  width: 400,
+                  width: width_screen,
                   child: TabBarView(
                     children: <Widget>[
                       ListView(
@@ -183,11 +185,11 @@ class _FeriasState extends State<Ferias> {
       String id = '';
 
       if (firstName != null && lastName != null) {
-        _feriasService.getAll().then((List<FeriasSze> listFerias) {
+        _feriasService.getListVacation().then((List<QuemEstaFerias> listFerias) {
           setState(() {
             userId = id;
             databaseFerias = {};
-            for (FeriasSze ferias in listFerias) {
+            for (QuemEstaFerias ferias in listFerias) {
               databaseFerias[ferias.r_e_c_n_o_field.toString()] = ferias;
             }
 
@@ -245,68 +247,62 @@ class _FeriasState extends State<Ferias> {
             );
 
             databaseFerias.forEach((key, value) {
-
-              databaseColaboradores.forEach((keyColab, valueColab) {
-                if (value.rh_mat == valueColab.ze_mat) {
-                  nomeColaborador = valueColab.ze_nome.trim();
-                  tableContainer.add(
-                    TableRow(
-                      children: <Widget>[
-                        Container(
-                          height: 25,
-                          color: Colors.white,
-                          child: Text(
-                            valueColab.ze_nome.trim(),
-                            textAlign: TextAlign.start,
-                            style: GoogleFonts.acme(
-                              textStyle: const TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 13,
-                              ),
-                            ),
+              tableContainer.add(
+                TableRow(
+                  children: <Widget>[
+                    Container(
+                      height: 25,
+                      color: Colors.white,
+                      child: Text(
+                        value.ze_nome.trim(),
+                        textAlign: TextAlign.start,
+                        style: GoogleFonts.acme(
+                          textStyle: const TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 13,
                           ),
                         ),
-                        Container(
-                          height: 25,
-                          color: Colors.white,
-                          child: Text(
-                            '${value.rh_dataini.substring(6, 8)}/'
-                                '${value.rh_dataini.substring(4, 6)}/'
-                                '${value.rh_dataini.substring(0, 4)}',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.acme(
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 17,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: 25,
-                          color: Colors.white,
-                          child: Text(
-                            '${value.rh_datafim.substring(6, 8)}/'
-                                '${value.rh_datafim.substring(4, 6)}/'
-                                '${value.rh_datafim.substring(0, 4)}',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.acme(
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontSize: 17,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  );
-                }
-              });
+                    Container(
+                      height: 25,
+                      color: Colors.white,
+                      child: Text(
+                        '${value.rh_dataini.substring(6, 8)}/'
+                            '${value.rh_dataini.substring(4, 6)}/'
+                            '${value.rh_dataini.substring(0, 4)}',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.acme(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 17,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 25,
+                      color: Colors.white,
+                      child: Text(
+                        '${value.rh_datafim.substring(6, 8)}/'
+                            '${value.rh_datafim.substring(4, 6)}/'
+                            '${value.rh_datafim.substring(0, 4)}',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.acme(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 17,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
             });
           });
         });

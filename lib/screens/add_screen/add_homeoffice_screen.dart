@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:projeto_aucs/models/ferias.dart';
+import 'package:projeto_aucs/models/last_recno_szh.dart';
 import 'package:projeto_aucs/models/spi010.dart';
 import 'package:projeto_aucs/models/sze010.dart';
 import 'package:projeto_aucs/models/szh010.dart';
@@ -230,9 +231,10 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
                               MaterialStateProperty.all(Colors.greenAccent),
                         ),
                         onPressed: () {
+                          getSzh010LastRecno();
                           for (final element in _selectedItems) {
-                            lastRecnoNum = lastRecnoNum + 1;
                             lastRecno[element] = lastRecnoNum;
+                            lastRecnoNum = lastRecnoNum + 1;
                           }
                           validateHomeOffice(context);
                         },
@@ -303,7 +305,7 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
         validateVacation = false;
       }
 
-      (validateColaborador || validateVacation)
+      (validateColaborador)
           ? ErrorDialog(
               context, 'Existem erros que impedem a gravação, verificar!!')
           : registerSzh010(context, key, value);
@@ -457,14 +459,15 @@ class _AddHomeOfficeScreenState extends State<AddHomeOfficeScreen> {
           id != null &&
           group != null) {
         recnoRegister = 0;
-
-        _homeOfficeService.getLastRecno().then((List<Szh010> listSzh010) {
+        lastRecnoNum = 0;
+        _homeOfficeService.getLastRecno().then((List<LastRecnoSzh> listSzh010) {
           if (mounted) {
             setState(() {
-              for (Szh010 szh010 in listSzh010) {
+              for (LastRecnoSzh szh010 in listSzh010) {
                 if (recnoRegister == 0) {
                   lastRecnoNum = szh010.r_e_c_n_o_field;
                 }
+                print(lastRecnoNum);
                 recnoRegister++;
               }
             });

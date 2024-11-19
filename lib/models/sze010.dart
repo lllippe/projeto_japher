@@ -16,6 +16,7 @@ class Sze010 {
   String ze_depto;
   String ze_niver;
   String ze_conveni;
+  String ze_email;
   int r_e_c_n_o_field;
 
   Sze010({
@@ -33,6 +34,7 @@ class Sze010 {
     required this.ze_depto,
     required this.ze_niver,
     required this.ze_conveni,
+    required this.ze_email,
     required this.r_e_c_n_o_field,
   });
 
@@ -51,6 +53,7 @@ class Sze010 {
         ze_depto = '',
         ze_niver = '',
         ze_conveni = '',
+        ze_email = '',
         r_e_c_n_o_field = 0;
 
   Sze010.fromMap(Map<String, dynamic> map)
@@ -68,6 +71,7 @@ class Sze010 {
         ze_depto = map['ze_depto'],
         ze_niver = map['ze_niver'],
         ze_conveni = map['ze_conveni'],
+        ze_email = map['ze_email'],
         r_e_c_n_o_field = map['r_e_c_n_o_field'];
 
   @override
@@ -91,6 +95,7 @@ class Sze010 {
       'ze_depto': ze_depto,
       'ze_niver' : ze_niver,
       'ze_conveni' : ze_conveni,
+      'ze_email' : ze_email,
       'r_e_c_n_o_field': r_e_c_n_o_field,
     };
   }
